@@ -714,18 +714,12 @@ var container;
 var camera, scene, renderer;
 var particles, particle, count = 0;
 
-var mouseX = 85,
-    mouseY = -342;
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
-
 init();
 animate();
 
 function init() {
     var container = document.querySelector('.bg');
-    
+
     camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 1000;
 
@@ -756,47 +750,14 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // Проверяем, поддерживает ли устройство указатель (мышь)
-    if (window.matchMedia("(pointer: fine)").matches) {
-        document.addEventListener('mousemove', onDocumentMouseMove, false);
-    } else {
-        document.removeEventListener('mousemove', onDocumentMouseMove, false);
-    }
-
-    document.addEventListener('touchstart', onDocumentTouchStart, false);
-    document.addEventListener('touchmove', onDocumentTouchMove, false);
     window.addEventListener('resize', onWindowResize, false);
 }
 
 function onWindowResize() {
-    windowHalfX = window.innerWidth / 2;
-    windowHalfY = window.innerHeight / 2;
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function onDocumentMouseMove(event) {
-    mouseX = event.clientX - windowHalfX;
-    mouseY = event.clientY - windowHalfY;
-}
-
-function onDocumentTouchStart(event) {
-    if (event.touches.length === 1) {
-        event.preventDefault();
-        mouseX = event.touches[0].pageX - windowHalfX;
-        mouseY = event.touches[0].pageY - windowHalfY;
-    }
-}
-
-function onDocumentTouchMove(event) {
-    if (event.touches.length === 1) {
-        event.preventDefault();
-        mouseX = event.touches[0].pageX - windowHalfX;
-        mouseY = event.touches[0].pageY - windowHalfY;
-    }
 }
 
 function animate() {
@@ -805,10 +766,7 @@ function animate() {
 }
 
 function render() {
-    camera.position.x += (mouseX - camera.position.x) * 0.009;
-    camera.position.y += (-mouseY - camera.position.y) * 0.009;
-    camera.lookAt(scene.position);
-
+    // Колебания частиц
     var i = 0;
     for (var ix = 0; ix < AMOUNTX; ix++) {
         for (var iy = 0; iy < AMOUNTY; iy++) {
@@ -821,4 +779,5 @@ function render() {
     renderer.render(scene, camera);
     count += 0.05;
 }
+
 
