@@ -724,7 +724,7 @@ function init() {
     camera.position.z = 1000;
 
     // Наклон камеры вниз на 15%
-    camera.rotation.x = -Math.atan(0.15);
+    camera.rotation.x = -Math.atan(0.75);
 
     scene = new THREE.Scene();
     particles = new Array();
