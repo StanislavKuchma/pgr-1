@@ -707,82 +707,138 @@ fragmentShader:"uniform vec3 color;\nuniform sampler2D map;\nuniform float opaci
 
 
 var SEPARATION = 100,
-    AMOUNTX = 100,
-    AMOUNTY = 70;
-
-var container;
-var camera, scene, renderer;
-var particles, particle, count = 0;
-
-init();
-animate();
-
-function init() {
-    var container = document.querySelector('.bg');
-
-    camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.z = 1000;
-
-    // Наклон камеры вниз на 15%
-    camera.rotation.x = -Math.atan(0.75);
-
-    scene = new THREE.Scene();
-    particles = new Array();
-
-    var PI2 = Math.PI * 2;
-    var material = new THREE.ParticleCanvasMaterial({
-        color: 0xe1e1e1,
-        program: function(context) {
-            context.beginPath();
-            context.arc(0, 0, 0.6, 0, PI2, true);
-            context.fill();
+        AMOUNTX = 100,
+        AMOUNTY = 70;
+ 
+    var container;
+    var camera, scene, renderer;
+ 
+    var particles, particle, count = 0;
+ 
+    var mouseX = 85,
+        mouseY = -342;
+ 
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+ 
+    init();
+    animate();
+ 
+    function init() {
+ 
+        var container = document.querySelector('.bg')
+     
+        camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 10000);
+        camera.position.z = 1000;
+ 
+        scene = new THREE.Scene();
+ 
+        particles = new Array();
+ 
+        var PI2 = Math.PI * 2;
+        var material = new THREE.ParticleCanvasMaterial({
+ 
+            color: 0xe1e1e1,
+            program: function(context) {
+ 
+                context.beginPath();
+                context.arc(0, 0, .6, 0, PI2, true);
+                context.fill();
+ 
+            }
+ 
+        });
+ 
+        var i = 0;
+ 
+        for (var ix = 0; ix < AMOUNTX; ix++) {
+ 
+            for (var iy = 0; iy < AMOUNTY; iy++) {
+ 
+                particle = particles[i++] = new THREE.Particle(material);
+                particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
+                particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
+                scene.add(particle);
+ 
+            }
+ 
         }
-    });
-
-    var i = 0;
-    for (var ix = 0; ix < AMOUNTX; ix++) {
-        for (var iy = 0; iy < AMOUNTY; iy++) {
-            particle = particles[i++] = new THREE.Particle(material);
-            particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
-            particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
-            scene.add(particle);
-        }
+ 
+        renderer = new THREE.CanvasRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+ 
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+        document.addEventListener('touchstart', onDocumentTouchStart, false);
+        document.addEventListener('touchmove', onDocumentTouchMove, false);
+ 
+        //
+ 
+        window.addEventListener('resize', onWindowResize, false);
+ 
     }
-
-    renderer = new THREE.CanvasRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-
-    window.addEventListener('resize', onWindowResize, false);
-}
-
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    render();
-}
-
-function render() {
-    // Колебания частиц
-    var i = 0;
-    for (var ix = 0; ix < AMOUNTX; ix++) {
-        for (var iy = 0; iy < AMOUNTY; iy++) {
-            particle = particles[i++];
-            particle.position.y = (Math.sin((ix + count) * 0.3) * 50) + (Math.sin((iy + count) * 0.5) * 50);
-            particle.scale.x = particle.scale.y = (Math.sin((ix + count) * 0.3) + 1) * 2 + (Math.sin((iy + count) * 0.5) + 1) * 2;
-        }
+ 
+    function onWindowResize() {
+ 
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+ 
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+ 
+        renderer.setSize(window.innerWidth, window.innerHeight);
+ 
     }
+ 
+    //
+ 
+    function onDocumentMouseMove(event) {
+ 
+        mouseX = event.clientX - windowHalfX;
+        mouseY = event.clientY - windowHalfY;
+ 
+    }
+ 
 
-    renderer.render(scene, camera);
-    count += 0.05;
-}
+ 
 
+ 
+    //
+ 
+    function animate() {
+ 
+        requestAnimationFrame(animate);
+ 
+        render();
+ 
+ 
+    }
+ 
+    function render() {
+ 
+        camera.position.x += (mouseX - camera.position.x) * .009;
+        camera.position.y += (-mouseY - camera.position.y) * .009;
+        camera.lookAt(scene.position);
+ 
+        var i = 0;
+ 
+        for (var ix = 0; ix < AMOUNTX; ix++) {
+ 
+            for (var iy = 0; iy < AMOUNTY; iy++) {
+ 
+                particle = particles[i++];
+                particle.position.y = (Math.sin((ix + count) * 0.3) * 50) + (Math.sin((iy + count) * 0.5) * 50);
+                particle.scale.x = particle.scale.y = (Math.sin((ix + count) * 0.3) + 1) * 2 + (Math.sin((iy + count) * 0.5) + 1) * 2;
+ 
+            }
+ 
+        }
+ 
+        renderer.render(scene, camera);
+ 
+        count += 0.05;
+ 
+    }
 
 
 
