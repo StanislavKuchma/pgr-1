@@ -771,7 +771,18 @@ function animate() {
 function render() {
     // Колебания частиц
     var i = 0;
-    for (var ix = 0; ix < AMOUNTX;
+    for (var ix = 0; ix < AMOUNTX; ix++) {
+        for (var iy = 0; iy < AMOUNTY; iy++) {
+            particle = particles[i++];
+            particle.position.y = (Math.sin((ix + count) * 0.3) * 50) + (Math.sin((iy + count) * 0.5) * 50);
+            particle.scale.x = particle.scale.y = (Math.sin((ix + count) * 0.3) + 1) * 2 + (Math.sin((iy + count) * 0.5) + 1) * 2;
+        }
+    }
+
+    renderer.render(scene, camera);
+    count += 0.05;
+}
+
 
 
 
